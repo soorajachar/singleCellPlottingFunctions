@@ -54,6 +54,14 @@ def returnLogYTicksAndLabels(yvals):
             allminoryticks.append(ytick+minory)
     return allyticks,allyticklabels,allminoryticks
 
+def is_number(s):
+    try:
+        complex(s) # for int, long, float and complex
+    except ValueError:
+        return False
+
+    return True
+
 def facetedSingleCellKDE(data=[],x='',hue='',hue_order='',size='',style='',row='',row_order='',col='',col_order='',col_wrap='',palette='',sharex=True,sharey=True,aspect=1,height=5,smooth_res=27,scaleToMode=False,logScale=False):
     """
     Wrapper for 1D smoothed histograms that follows same keyword conventions as seaborn figure level plots, with additional parameters for plotting single cell flow cytometery data
@@ -94,6 +102,10 @@ def facetedSingleCellKDE(data=[],x='',hue='',hue_order='',size='',style='',row='
     for kwargName,kwarg in zip(['row_order','col_order','hue_order','col_wrap','palette','aspect','height'],[row_order,col_order,hue_order,col_wrap,palette,aspect,height]):
         if kwarg != '':
             secondaryKwargDict[kwargName] = kwarg 
+        else:
+            if kwargName == 'palette':
+                if is_number(data[hue].iloc[0]):
+                    secondaryKwargDict[kwargName] = sns.color_palette(sns.color_palette(),len(pd.unique(data[hue])))
     secondaryKwargDict['facet_kws'] = {'sharex':sharex,'sharey':sharey}
 
     kwargIndices = sorted(kwargIndices)
