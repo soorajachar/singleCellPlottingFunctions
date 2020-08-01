@@ -6,17 +6,17 @@ To use this package:
 2. Add path to this folder to your script, and import relevant plotting functions from the library
 
 Examples:
-1D Biexponential X:
+1D Biexponential X:  
 ![image info](./examples/1D-numericXYExample.png)
 
-2D Biexponential X and Y, Biexponential Hue, Column, Column wrapping:
+2D Biexponential X and Y, Biexponential Hue, Column, Column wrapping:  
 ![image info](./examples/2D-numericXYHueExample.png)
 
-2D Biexponential X and Y, Categorical Hue, Show lower densities:
+2D Biexponential X and Y, Categorical Hue, Show lower densities:  
 ![image info](./examples/numericXYExample.png)
 
-2D Linear X and Y, Categorical Hue, Column:
+2D Linear X and Y, Categorical Hue, Column:  
 ![image info](./examples/categoricalHueSplitColumn.png)
 
-2D Biexponential X and Y, Biexponential Hue, Row, Column:
+2D Biexponential X and Y, Biexponential Hue, Row, Column:  
 ![image info](./examples/rowcolExample.png)
