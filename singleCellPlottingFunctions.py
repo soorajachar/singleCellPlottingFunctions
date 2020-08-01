@@ -194,7 +194,7 @@ def createSingleDataShadedPlot(subsettedData,x='',y='',hue='',hue_order='',palet
 
     return dataShadedPlot
 
-def facetedSingleCellScatter(data=[],x='',y='',hue='',hue_order='',row='',row_order='',col='',col_order='',col_wrap='',palette='',fig_size=150,context='notebook',biExpXYScale = True, biExpHueScale = False,spread_threshold='',legend=True):
+def facetedSingleCellScatter(data=[],x='',y='',hue='',hue_order='',row='',row_order='',col='',col_order='',col_wrap='',palette='',fig_size=150,context='notebook',biExpXYScale = True, biExpHueScale = False,spread_threshold='',legend=True,dpi=120):
     """
     Wrapper for datashader plots that follows same keyword conventions as seaborn figure level plots, with additional parameters for plotting single cell flow cytometery data
     
@@ -269,7 +269,7 @@ def facetedSingleCellScatter(data=[],x='',y='',hue='',hue_order='',row='',row_or
                 row_order = list(pd.unique(rowValues))
             for rowVal in row_order:
                 subsettedData = data[data[row] == rowVal]
-                dataShadedPlot = createSingleDataShadedPlot(subsettedData,x=x,y=y,hue=hue,hue_order=hue_order,palette=palette,color_key=color_key,label=row+':',group=rowVal,spread_threshold=spread_threshold)
+                dataShadedPlot = createSingleDataShadedPlot(subsettedData,x=x,y=y,hue=hue,hue_order=hue_order,palette=palette,color_key=color_key,label=row+':',group=str(rowVal),spread_threshold=spread_threshold)
                 shadeList.append(dataShadedPlot)
     else:
         #If column passed
@@ -279,7 +279,7 @@ def facetedSingleCellScatter(data=[],x='',y='',hue='',hue_order='',row='',row_or
                 col_order = list(pd.unique(colValues))
             for colVal in col_order:
                 subsettedData = data[data[col] == colVal]
-                dataShadedPlot = createSingleDataShadedPlot(subsettedData,x=x,y=y,hue=hue,hue_order=hue_order,palette=palette,color_key=color_key,label=col+':',group=colVal,spread_threshold=spread_threshold)
+                dataShadedPlot = createSingleDataShadedPlot(subsettedData,x=x,y=y,hue=hue,hue_order=hue_order,palette=palette,color_key=color_key,label=col+':',group=str(colVal),spread_threshold=spread_threshold)
                 shadeList.append(dataShadedPlot)
         #If row and column passed
         else:
@@ -294,7 +294,7 @@ def facetedSingleCellScatter(data=[],x='',y='',hue='',hue_order='',row='',row_or
                 for colVal in col_order:
                     if str(rowVal)+','+str(colVal) in uniquePairValues:
                         subsettedData = data[(data[row] == rowVal) & (data[col] == colVal)]
-                        dataShadedPlot = createSingleDataShadedPlot(subsettedData,x=x,y=y,hue=hue,hue_order=hue_order,palette=palette,color_key=color_key,label=row+': '+rowVal+',',group=col+': '+colVal,spread_threshold=spread_threshold)
+                        dataShadedPlot = createSingleDataShadedPlot(subsettedData,x=x,y=y,hue=hue,hue_order=hue_order,palette=palette,color_key=color_key,label=row+': '+str(rowVal)+',',group=col+': '+str(colVal),spread_threshold=spread_threshold)
                         shadeList.append(dataShadedPlot)
 
     #Wrap columns appropriately
@@ -308,7 +308,7 @@ def facetedSingleCellScatter(data=[],x='',y='',hue='',hue_order='',row='',row_or
 
     sns.set_context(context)
     hvLayout = hv.Layout(shadeList).cols(subplotsPerRow).opts(tight=True,sublabel_format="",fig_size=fig_size)
-    fig = hv.render(hvLayout,dpi=120)
+    fig = hv.render(hvLayout,dpi=dpi)
 
     #Make plots the same size (HACK; need to figure out how to make them the same size even with different scales)
     xmin = data[x].min()
@@ -329,7 +329,7 @@ def facetedSingleCellScatter(data=[],x='',y='',hue='',hue_order='',row='',row_or
         axis.set_ylim([ymin,ymax])
         #Also remove common x labels across columns and common y labels across rows
         if col_wrap != '':
-            if subplotsPerRow*(math.ceil(len(col_order)/col_wrap)-1) <= i < subplotsPerRow*math.ceil(len(col_order)/col_wrap):
+            if subplotsPerRow*(math.ceil(len(col_order)/subplotsPerRow)-1) <= i < subplotsPerRow*math.ceil(len(col_order)/subplotsPerRow):
                 pass
             else:
                 axis.set_xlabel('')
@@ -364,7 +364,7 @@ def facetedSingleCellScatter(data=[],x='',y='',hue='',hue_order='',row='',row_or
                     cbl = fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=mplPalette),orientation='vertical',ticks=hueTickValues,cax=cbar_ax)
                     cbl.ax.set_yticklabels(hueTickLabels)
                 else:
-                    cbl = fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=mplPalette),orientation='vertical')
+                    cbl = fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=mplPalette),orientation='vertical',cax=cbar_ax)
                 cbl.set_label(hue)
         #Regular legend needed (categorical)
         else:
