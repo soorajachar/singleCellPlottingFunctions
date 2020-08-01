@@ -16,7 +16,8 @@ g = facetedSingleCellKDE(data=plottingDf,x='CD69',hue='Cluster',scaleToMode=True
 2D Biexponential X and Y, Biexponential Hue, Different Colormaps:  
 ``` 
 g = facetedSingleCellScatter(data=plottingDf,x='CD69',y='CD25',hue='PD-1',
-    biExpXYScale=True,biExpHueScale=True,palette='RdBu_r')  
+    biExpXYScale=True,biExpHueScale=True,palette='RdBu_r')   
+
 g = facetedSingleCellScatter(data=plottingDf,x='CD69',y='CD25',hue='PD-1',
     biExpXYScale=True,biExpHueScale=True,palette=cc.cm.fire)  
 ```
