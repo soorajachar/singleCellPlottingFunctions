@@ -17,9 +17,9 @@ g = facetedSingleCellKDE(data=plottingDf,x='CD69',hue='Cluster',scaleToMode=True
 ``` 
 g = facetedSingleCellScatter(data=plottingDf,x='CD69',y='CD25',hue='PD-1',biExpXYScale=True,biExpHueScale=True,palette='RdBu_r')  
 g = facetedSingleCellScatter(data=plottingDf,x='CD69',y='CD25',hue='PD-1',biExpXYScale=True,biExpHueScale=True,palette=cc.cm.fire)  
+```
 ![image info](./examples/differentCmap1.png)  
 ![image info](./examples/differentCmap2.png)
-```
 
 2D Linear X and Y, Categorical Hue:  
 ``` 
