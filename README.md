@@ -18,14 +18,16 @@ To use this package:
     g = facetedSingleCellScatter(data=plottingDf,x='CD69',y='CD25',hue='PD-1',biExpXYScale=True,biExpHueScale=True,palette='RdBu_r')  
 ``` 
 ![image info](./examples/differentCmap1.png)  
+```
     g = facetedSingleCellScatter(data=plottingDf,x='CD69',y='CD25',hue='PD-1',biExpXYScale=True,biExpHueScale=True,palette=cc.cm.fire)  
+```
 ![image info](./examples/differentCmap2.png)
 
 2D Linear X and Y, Categorical Hue:  
 ``` 
     g = facetedSingleCellScatter(data=plottingDf,x='UMAP 1',y='UMAP 2',hue='Cluster',palette=cc.glasbey,hue_order=sortedClusterLabels)  
 ``` 
-![image info](./examples/LinXY_CatHue.png)
+![image info](./examples/linXY_CatHue.png)
 
 2D Biexponential X and Y, Categorical Hue, Show lower densities:  
 ``` 
