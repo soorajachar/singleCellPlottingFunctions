@@ -6,4 +6,4 @@ To use this package:
 2. Add path to this folder to your script, and import relevant plotting functions from the library
 
 Examples:
-![image info](./examples/2D-numericXYHueExample.png)
+![image info](./examples/2D-numericXYHueExample.svg)
