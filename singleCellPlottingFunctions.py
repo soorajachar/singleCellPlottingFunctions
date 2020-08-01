@@ -135,8 +135,11 @@ def facetedSingleCellKDE(data=[],x='',hue='',hue_order='',size='',style='',row='
     for i,val in enumerate(smoothedHistBins):
         if val < cutoff:
             smoothedHistBins[i] = cutoff
-     
-    mi  = pd.MultiIndex.from_tuples(indexTuples,names=itemgetter(*kwargIndices)(list(data.columns)))
+    
+    trueNames = itemgetter(*kwargIndices)(list(data.columns))
+    if type(trueNames) != list:
+         trueNames = [trueNames]
+    mi  = pd.MultiIndex.from_tuples(indexTuples,names=trueNames) 
     if scaleToMode:
         hist = [x*100 for x in hist]
         smoothedHistBins = [x*100 for x in smoothedHistBins]
@@ -245,9 +248,11 @@ def facetedSingleCellScatter(data=[],x='',y='',hue='',hue_order='',row='',row_or
         else:
             if palette == '':
                 palette = cc.fire
+                mplPalette = cc.cm.fire
             else:
                 if type(palette) == str:
                     palette = cm.get_cmap(palette, 256)
+                mplPalette = palette
             color_key = ''
 
     shadeList = []
@@ -356,10 +361,10 @@ def facetedSingleCellScatter(data=[],x='',y='',hue='',hue_order='',row='',row_or
                 if biExpHueScale:
                     hueticks = [-1000,100,1000,10000,100000]
                     hueTickValues,hueTickLabels = returnTicks(hueticks)
-                    cbl = fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=palette),orientation='vertical',ticks=hueTickValues,cax=cbar_ax)
+                    cbl = fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=mplPalette),orientation='vertical',ticks=hueTickValues,cax=cbar_ax)
                     cbl.ax.set_yticklabels(hueTickLabels)
                 else:
-                    cbl = fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=palette),orientation='vertical')
+                    cbl = fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=mplPalette),orientation='vertical')
                 cbl.set_label(hue)
         #Regular legend needed (categorical)
         else:
