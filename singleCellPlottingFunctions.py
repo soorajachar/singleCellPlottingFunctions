@@ -369,7 +369,9 @@ def facetedSingleCellScatter(data=[],x='',y='',hue='',hue_order='',row='',row_or
                 norm = mpl.colors.Normalize(vmin=min(data[hue].values),vmax = max(data[hue].values))
                 fig.subplots_adjust(bottom=0.1, top=0.9, left=0.1, right=0.9)
                 # add an axes, lower left corner in [0.83, 0.1] measured in figure coordinate with axes width 0.02 and height 0.8
-                cbar_ax = fig.add_axes([0.95, 0.1, 0.02*(2/subplotsPerRow), 0.8])
+                barWidth = 0.02*(2/subplotsPerRow)
+                barHeight = 0.8*(1/math.ceil(len(shadeList)/subplotsPerRow))
+                cbar_ax = fig.add_axes([0.95, 0.5-(0.1+barHeight/2)+0.1, barWidth, barHeight])
                 if biExpHueScale:
                     hueticks = [-1000,100,1000,10000,100000]
                     hueTickValues,hueTickLabels = returnTicks(hueticks)
@@ -380,7 +382,6 @@ def facetedSingleCellScatter(data=[],x='',y='',hue='',hue_order='',row='',row_or
                 cbl.set_label(hue)
         #Regular legend needed (categorical)
         else:
-            #legend_elements = [Line2D([0], [0], marker='o', color='w', label='Scatter',markerfacecolor='g', markersize=15)]
             legendElemList = [Line2D([0], [0], marker='o', color='w', label=hue,markerfacecolor='w', markersize=15)]
             for categoryValue in color_key:
                 legend_element = Line2D([0], [0], marker='o', color='w', label=categoryValue,markerfacecolor=color_key[categoryValue], markersize=10)
