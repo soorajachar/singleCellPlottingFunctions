@@ -149,7 +149,7 @@ def facetedSingleCellKDE(data=[],x='',hue='',hue_order='',size='',style='',row='
             smoothedHistBins[i] = cutoff
     
     trueNames = itemgetter(*kwargIndices)(list(data.columns))
-    if type(trueNames) != list:
+    if type(trueNames) != list and type(trueNames) != tuple::
          trueNames = [trueNames]
     mi  = pd.MultiIndex.from_tuples(indexTuples,names=trueNames) 
     if scaleToMode:
