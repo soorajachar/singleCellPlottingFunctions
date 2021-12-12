@@ -187,9 +187,9 @@ def createSingleDataShadedPlot(subsettedData,x='',y='',hue='',hue_order='',palet
     #No color plotting
     if hue == '':
         if spread_threshold == '':
-            dataShadedPlot = hd.datashade(hv.Points(subsettedData, kdims=[x, y]))
+            dataShadedPlot = hd.datashade(hv.Points(subsettedData, kdims=[x, y])).relabel(label=label,group=group)
         else:
-            hd.dynspread(dataShadedPlot = hd.datashade(hv.Points(subsettedData, kdims=[x, y])), threshold=spread_threshold)
+            hd.dynspread(dataShadedPlot = hd.datashade(hv.Points(subsettedData, kdims=[x, y])), threshold=spread_threshold).relabel(label=label,group=group)
     else:
         #Categorical color plotting
         if type(subsettedData[hue].iloc[0]) == str:
