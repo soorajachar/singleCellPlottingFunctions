@@ -17,8 +17,31 @@ import holoviews as hv
 import colorcet as cc
 import holoviews.operation.datashader as hd
 
-import warnings
+import warnings,re
 warnings.filterwarnings("ignore")
+
+def get_cluster_centroids(plottingDf,dims=['UMAP 1','UMAP 2'],singleCluster=False):
+    clusterCentroids = []
+    if not singleCluster:
+        for cluster in pd.unique(plottingDf['Cluster']):
+            numeric = re.findall(r'\d+', str(cluster))
+            clusterSubset = plottingDf[plottingDf['Cluster'] == cluster]
+            clusterX = list(clusterSubset[dims[0]])
+            clusterY = list(clusterSubset[dims[1]])
+            clusterCentroid = (sum(clusterX) / len(clusterX), sum(clusterY) / len(clusterX))
+            clusterCentroids.append([str(numeric[0]),clusterCentroid])
+    else:
+        if 'Cluster' in plottingDf.columns:
+            cluster = list(pd.unique(plottingDf['Cluster']))[0]
+            numeric = re.findall(r'\d+', str(cluster))
+        else:
+            numeric = [1]
+        clusterSubset = plottingDf.copy()
+        clusterX = list(clusterSubset[dims[0]])
+        clusterY = list(clusterSubset[dims[1]])
+        clusterCentroid = (sum(clusterX) / len(clusterX), sum(clusterY) / len(clusterX))
+        clusterCentroids.append([str(numeric[0]),clusterCentroid])
+    return clusterCentroids
 
 def returnTicks(xticksToUse):
     logxticks = [-1000,-100,-10,0,10,100,1000,10000,100000]
@@ -206,7 +229,7 @@ def createSingleDataShadedPlot(subsettedData,x='',y='',hue='',hue_order='',palet
 
     return dataShadedPlot
 
-def facetedSingleCellScatter(data=[],x='',y='',hue='',hue_order='',row='',row_order='',col='',col_order='',col_wrap='',palette='',fig_size=150,context='notebook',biExpXYScale = True, biExpHueScale = False,spread_threshold='',legend=True,dpi=120):
+def facetedSingleCellScatter(data=[],x='',y='',hue='',hue_order='',row='',row_order='',col='',col_order='',col_wrap='',palette='',fig_size=150,context='notebook',biExpXYScale = True, biExpHueScale = False,spread_threshold='',legend=True,dpi=120,annotation=False):
     """
     Wrapper for datashader plots that follows same keyword conventions as seaborn figure level plots, with additional parameters for plotting single cell flow cytometery data
     
@@ -229,7 +252,8 @@ def facetedSingleCellScatter(data=[],x='',y='',hue='',hue_order='',row='',row_or
     biExpHueScale (bool):Whether to use a special biexponential scale on the hue axis for flow cytometry derived single cell data
     spread_threshold (float):Value between 0 and 1 that determines how visible less dense regions are
     legend (bool):Whether to display legend or not
-
+    annotation (bool):Whether to annotate the centroids of the hue variable or not
+    
     Returns:
     matplotlib figure derived from datashaded bokeh figure
     """
@@ -266,6 +290,9 @@ def facetedSingleCellScatter(data=[],x='',y='',hue='',hue_order='',row='',row_or
                     palette = cm.get_cmap(palette, 256)
                 mplPalette = palette
             color_key = ''
+
+    if annotation:
+        clusterCents = get_cluster_centroids(data,dims=[x,y])
 
     shadeList = []
     #Create combinations of all row/column pairs
@@ -339,6 +366,11 @@ def facetedSingleCellScatter(data=[],x='',y='',hue='',hue_order='',row='',row_or
             axis.set_yticklabels(ytickLabels)
         axis.set_xlim([xmin,xmax])
         axis.set_ylim([ymin,ymax])
+        if annotation:
+            for clusterCent in clusterCents:
+                cluster = clusterCent[0]
+                centroid = clusterCent[1]
+                axis.annotate(str(cluster),xy=centroid)
         #Also remove common x labels across columns and common y labels across rows
         if col_wrap != '':
             if subplotsPerRow*(math.ceil(len(col_order)/subplotsPerRow)-1) <= i < subplotsPerRow*math.ceil(len(col_order)/subplotsPerRow):
