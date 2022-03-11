@@ -114,6 +114,8 @@ def facetedSingleCellKDE(data=[],x='',hue='',hue_order='',size='',style='',row='
     Returns:
     seaborn relplot facetgrid 
     """
+    if type(data) != list:
+        data = data.reset_index()
     kwargIndices = []
     cols = list(data.columns)
     kwargDict = {}
@@ -260,6 +262,8 @@ def facetedSingleCellScatter(data=[],x='',y='',hue='',hue_order='',row='',row_or
     hv.extension("matplotlib")
     hv.output(backend="matplotlib")
 
+    if type(data) != list:
+        data = data.reset_index()
     #TODO: Allow color to change even if hue is blank
     #Create palette/color_key
     #No color plotting
