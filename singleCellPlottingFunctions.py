@@ -20,6 +20,47 @@ import holoviews.operation.datashader as hd
 import warnings,re
 warnings.filterwarnings("ignore")
 
+def createClusterFrequencyDataframe(singleCellDf,clusterName='Cluster',cluster_labels=[]):
+    clusterdf = singleCellDf.assign(Cluster=cluster_labels).set_index(clusterName, append=True).droplevel('Event')
+    indexingDf = clusterdf.groupby(list(singleCellDf.index.names)[:-1]).first()
+    newdfTuples = []
+    newDataMatrixList = []
+    newDataMatrixList2 = []
+    clusterOrder = []
+    clusterDictKeys = list(pd.unique(clusterdf.index.get_level_values(clusterName)))
+    clusterDictKeys.sort(key=int)
+    emptyClusterDict = {}
+
+    for clusterKey in clusterDictKeys:
+        emptyClusterDict[clusterKey] = 0
+    for row in range(indexingDf.shape[0]):
+        index = indexingDf.iloc[row,:].name
+        #Percent
+        sampleDf = clusterdf.loc[index].index.get_level_values(clusterName).value_counts(normalize=True).mul(100).T
+        #Count
+        sampleDf2 = clusterdf.loc[index].index.get_level_values(clusterName).value_counts().T
+        clusterDict = emptyClusterDict.copy()
+        clusterDict2 = emptyClusterDict.copy()
+        cvals = []
+        cvals2 = []
+        for clusterKey in sampleDf.index:
+            clusterDict[clusterKey] = sampleDf.loc[clusterKey]
+        for clusterKey2 in sampleDf2.index:
+            clusterDict2[clusterKey2] = sampleDf2.loc[clusterKey2]
+        newDataMatrixList.append(list(clusterDict.values()))
+        newDataMatrixList2.append(list(clusterDict2.values()))
+        newdfTuples.append(list(index))
+
+    newDataMatrix = np.vstack(newDataMatrixList)
+    newDataMatrix2 = np.vstack(newDataMatrixList2)
+    mi = pd.MultiIndex.from_tuples(newdfTuples,names=indexingDf.index.names)
+    percentdf = pd.DataFrame(newDataMatrix,index=mi,columns=list(clusterDict.keys()))
+    countdf = pd.DataFrame(newDataMatrix2,index=mi,columns=list(clusterDict.keys()))
+
+    frequencydf = pd.concat([percentdf,countdf],keys=['percent','count'],names=['Statistic']).swaplevel(0,1)
+    frequencydf.columns.name = clusterName
+    return frequencydf
+
 def get_cluster_centroids(plottingDf,dims=['UMAP 1','UMAP 2'],clusterName='Cluster',singleCluster=False,statistic='median'):
     clusterCentroids = []
     if not singleCluster:
