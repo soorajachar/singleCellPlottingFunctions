@@ -20,7 +20,7 @@ import holoviews.operation.datashader as hd
 import warnings,re
 warnings.filterwarnings("ignore")
 
-def get_cluster_centroids(plottingDf,dims=['UMAP 1','UMAP 2'],clusterName='Cluster',singleCluster=False):
+def get_cluster_centroids(plottingDf,dims=['UMAP 1','UMAP 2'],clusterName='Cluster',singleCluster=False,statistic='median'):
     clusterCentroids = []
     if not singleCluster:
         for cluster in pd.unique(plottingDf[clusterName]):
@@ -28,7 +28,10 @@ def get_cluster_centroids(plottingDf,dims=['UMAP 1','UMAP 2'],clusterName='Clust
             clusterSubset = plottingDf[plottingDf[clusterName] == cluster]
             clusterX = list(clusterSubset[dims[0]])
             clusterY = list(clusterSubset[dims[1]])
-            clusterCentroid = (sum(clusterX) / len(clusterX), sum(clusterY) / len(clusterX))
+            if statistic == 'median':
+                clusterCentroid = (np.median(clusterX),np.median(clusterY))
+            else:
+                clusterCentroid = (sum(clusterX) / len(clusterX), sum(clusterY) / len(clusterX))
             clusterCentroids.append([str(numeric[0]),clusterCentroid])
     else:
         if clusterName in plottingDf.columns:
@@ -39,7 +42,10 @@ def get_cluster_centroids(plottingDf,dims=['UMAP 1','UMAP 2'],clusterName='Clust
         clusterSubset = plottingDf.copy()
         clusterX = list(clusterSubset[dims[0]])
         clusterY = list(clusterSubset[dims[1]])
-        clusterCentroid = (sum(clusterX) / len(clusterX), sum(clusterY) / len(clusterX))
+        if statistic == 'median':
+            clusterCentroid = (np.median(clusterX),np.median(clusterY))
+        else:
+            clusterCentroid = (sum(clusterX) / len(clusterX), sum(clusterY) / len(clusterX))
         clusterCentroids.append([str(numeric[0]),clusterCentroid])
     return clusterCentroids
 
@@ -48,7 +54,7 @@ def returnTicks(xticksToUse):
     logicleXTicks = [64, 212, 229, 231, 233, 251, 399, 684, 925]
     xtickValues = []
     xtickLabels = []
-
+    
     for logxtick in xticksToUse:
         if(logxtick < 0):
             xtickLabels.append('$-10^'+str(int(np.log10(-1*logxtick)))+'$')
@@ -56,11 +62,11 @@ def returnTicks(xticksToUse):
             xtickLabels.append('0')
         else:
             xtickLabels.append('$10^'+str(int(np.log10(logxtick)))+'$')
-
+    
     for tickval in xticksToUse:
         xtickValue = logicleXTicks[logxticks.index(tickval)]
         xtickValues.append(xtickValue)
-
+    
     return xtickValues,xtickLabels
 
 def returnLogYTicksAndLabels(yvals):
@@ -88,15 +94,15 @@ def is_number(s):
 def facetedSingleCellKDE(data=[],x='',hue='',hue_order='',size='',style='',row='',row_order='',col='',col_order='',col_wrap='',palette='',sharex=True,sharey=True,aspect=1,height=5,smooth_res=27,scaleToMode=False,logScale=False):
     """
     Wrapper for 1D smoothed histograms that follows same keyword conventions as seaborn figure level plots, with additional parameters for plotting single cell flow cytometery data
-
-
+    
+    
     Parameters:
     data (pd.DataFrame):tidy format pandas dataframe
     x (str):Name of dataframe level to plot on x axis
     hue (str):Name of dataframe level to color plot by
     hue_order (list):Fixes order of color assignment
-    size (str):Name of dataframe level used to assign line thicknesses to different histograms
-    style (str):Name of dataframe level used to assign line plotting styles to different histograms
+    size (str):Name of dataframe level used to assign line thicknesses to different histograms 
+    style (str):Name of dataframe level used to assign line plotting styles to different histograms 
     row (str):Name of dataframe level to assign to each row of subplots
     row_order (list):Fixes order of subplot row assignment
     col (str):Name of dataframe level to assign to each column of subplots
@@ -109,9 +115,9 @@ def facetedSingleCellKDE(data=[],x='',hue='',hue_order='',size='',style='',row='
     height (int):Height of figure; 5 is default
     smooth_res (int):How much to smooth the histogram (to allow it to resemble a KDE). Lower values cause less smoothing
     scaleToMode (bool):Whether to scale the y axis of each subplot by the maximum count of each plot
-    logScale (bool):Whether to scale the y axis of each subplot logarithmically
+    logScale (bool):Whether to scale the y axis of each subplot logarithmically 
     Returns:
-    seaborn relplot facetgrid
+    seaborn relplot facetgrid 
     """
     if type(data) != list:
         data = data.reset_index()
@@ -125,7 +131,7 @@ def facetedSingleCellKDE(data=[],x='',hue='',hue_order='',size='',style='',row='
     secondaryKwargDict = {}
     for kwargName,kwarg in zip(['row_order','col_order','hue_order','col_wrap','palette','aspect','height'],[row_order,col_order,hue_order,col_wrap,palette,aspect,height]):
         if kwarg != '':
-            secondaryKwargDict[kwargName] = kwarg
+            secondaryKwargDict[kwargName] = kwarg 
         else:
             if kwargName == 'palette':
                 if is_number(data[hue].iloc[0]):
@@ -156,8 +162,8 @@ def facetedSingleCellKDE(data=[],x='',hue='',hue_order='',size='',style='',row='
     histBins = np.tile(list(range(1,1024,4)),numUniquePlots)
     if smooth_res % 2 == 0:
         smooth_res-=1
-    smoothedHistBins = savgol_filter(hist, smooth_res, 2)
-
+    smoothedHistBins = savgol_filter(hist, smooth_res, 2) 
+    
     if not scaleToMode:
         if logScale:
             cutoff = 1
@@ -165,17 +171,17 @@ def facetedSingleCellKDE(data=[],x='',hue='',hue_order='',size='',style='',row='
             cutoff = 0
     else:
         if logScale:
-            cutoff = 0.001
+            cutoff = 0.001 
         else:
             cutoff = 0
     for i,val in enumerate(smoothedHistBins):
         if val < cutoff:
             smoothedHistBins[i] = cutoff
-
+    
     trueNames = itemgetter(*kwargIndices)(list(data.columns))
     if type(trueNames) != list and type(trueNames) != tuple:
          trueNames = [trueNames]
-    mi  = pd.MultiIndex.from_tuples(indexTuples,names=trueNames)
+    mi  = pd.MultiIndex.from_tuples(indexTuples,names=trueNames) 
     if scaleToMode:
         hist = [x*100 for x in hist]
         smoothedHistBins = [x*100 for x in smoothedHistBins]
@@ -188,7 +194,7 @@ def facetedSingleCellKDE(data=[],x='',hue='',hue_order='',size='',style='',row='
 
     newdf = pd.DataFrame(dataMatrix,columns=columns,index=mi)
     data = newdf.reset_index()
-
+    
     fg = sns.relplot(data=data,kind='line',x=x,y=columns[1],**kwargDict,**secondaryKwargDict)
 
     xtickValues,xtickLabels = returnTicks([-1000,1000,10000,100000])
@@ -230,11 +236,11 @@ def createSingleDataShadedPlot(subsettedData,x='',y='',hue='',hue_order='',palet
 
     return dataShadedPlot
 
-def facetedSingleCellScatter(data=[],x='',y='',hue='',hue_order='',row='',row_order='',col='',col_order='',col_wrap='',palette='',fig_size=150,context='notebook',biExpXYScale = True, biExpHueScale = False,spread_threshold='',legend=True,dpi=120,annotation=False):
+def facetedSingleCellScatter(data=[],x='',y='',hue='',hue_order='',row='',row_order='',col='',col_order='',col_wrap='',palette='',fig_size=150,context='notebook',biExpXYScale = True, biExpHueScale = False,spread_threshold='',legend=True,dpi=120,annotation=False,annotationCenterStat='mean'):
     """
     Wrapper for datashader plots that follows same keyword conventions as seaborn figure level plots, with additional parameters for plotting single cell flow cytometery data
-
-
+    
+    
     Parameters:
     data (pd.DataFrame):tidy format pandas dataframe
     x (str):Name of dataframe level to plot on x axis
@@ -254,7 +260,7 @@ def facetedSingleCellScatter(data=[],x='',y='',hue='',hue_order='',row='',row_or
     spread_threshold (float):Value between 0 and 1 that determines how visible less dense regions are
     legend (bool):Whether to display legend or not
     annotation (bool):Whether to annotate the centroids of the hue variable or not
-
+    annotationClusterStat:Whether to use mean or median to calculate centroid of clusters    
     Returns:
     matplotlib figure derived from datashaded bokeh figure
     """
@@ -295,7 +301,7 @@ def facetedSingleCellScatter(data=[],x='',y='',hue='',hue_order='',row='',row_or
             color_key = ''
 
     if annotation:
-        clusterCents = get_cluster_centroids(data,dims=[x,y],clusterName=hue)
+        clusterCents = get_cluster_centroids(data,dims=[x,y],clusterName=hue,statistic=annotationCenterStat)
 
     shadeList = []
     #Create combinations of all row/column pairs
@@ -392,7 +398,7 @@ def facetedSingleCellScatter(data=[],x='',y='',hue='',hue_order='',row='',row_or
                     pass
                 else:
                     axis.set_ylabel('')
-
+    
     #Create legend
     if legend:
         if color_key == '':
@@ -424,3 +430,4 @@ def facetedSingleCellScatter(data=[],x='',y='',hue='',hue_order='',row='',row_or
             fig.legend(handles=legendElemList,frameon=False, loc='center left', bbox_to_anchor=(0.95, 0.5), bbox_transform=fig.transFigure)
 
     return fig
+
