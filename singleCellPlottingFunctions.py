@@ -323,7 +323,10 @@ def facetedSingleCellScatter(data=[],x='',y='',hue='',hue_order='',row='',row_or
             if hue_order == '':
                 hue_order = list(pd.unique(data[hue]))
             if palette == '':
-                palette = sns.color_palette(sns.color_palette(),len(hue_order)).as_hex()
+                if len(hue_order) > 10:
+                    palette = cc.glasbey
+                else:
+                    palette = sns.color_palette(sns.color_palette(),len(hue_order)).as_hex()
             else:
                 if type(palette) == str:
                     palette = sns.color_palette(palette,len(hue_order)).as_hex()
