@@ -132,7 +132,7 @@ def is_number(s):
 
     return True
 
-def facetedSingleCellKDE(data=[],x='',hue='',hue_order='',size='',style='',row='',row_order='',col='',col_order='',col_wrap='',palette='',sharex=True,sharey=True,aspect=1,height=5,smooth_res=27,scaleToMode=False,logScale=False):
+def facetedSingleCellKDE(data=[],x='',hue='',hue_order='',size='',style='',row='',row_order='',col='',col_order='',col_wrap='',palette='',sharex=True,sharey=True,margin_titles=True,aspect=1,height=5,smooth_res=27,scaleToMode=False,logScale=False):
     """
     Wrapper for 1D smoothed histograms that follows same keyword conventions as seaborn figure level plots, with additional parameters for plotting single cell flow cytometery data
     
@@ -152,6 +152,7 @@ def facetedSingleCellKDE(data=[],x='',hue='',hue_order='',size='',style='',row='
     palette (str or list):Either the name of the list of colors to use, or an explicit list of colors to use in hex
     sharex (bool or str):True will share x axis across all subplots, row will share per row, col will share per column, False will not share at all
     sharey (bool or str):True will share y axis across all subplots, row will share per row, col will share per column, False will not share at all
+    margin_titles (bool):True will plot subplot titles in ggplot style
     aspect (int):Width of figure; 1 is default
     height (int):Height of figure; 5 is default
     smooth_res (int):How much to smooth the histogram (to allow it to resemble a KDE). Lower values cause less smoothing
@@ -177,7 +178,7 @@ def facetedSingleCellKDE(data=[],x='',hue='',hue_order='',size='',style='',row='
             if kwargName == 'palette':
                 if is_number(data[hue].iloc[0]):
                     secondaryKwargDict[kwargName] = sns.color_palette(sns.color_palette(),len(pd.unique(data[hue])))
-    secondaryKwargDict['facet_kws'] = {'sharex':sharex,'sharey':sharey}
+    secondaryKwargDict['facet_kws'] = {'sharex':sharex,'sharey':sharey,'margin_titles':margin_titles}
 
     kwargIndices = sorted(kwargIndices)
     uniqueKwargCombinations = [list(temp) for temp in set(tuple(temp) for temp in list(data.iloc[:,kwargIndices].values))]
